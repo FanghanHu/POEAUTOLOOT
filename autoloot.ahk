@@ -6,7 +6,21 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ;make it so only 1 instance of the script can be run at a time.
 #SingleInstance Force
 
+;screen resolution, onl changing this does not make this script work for other resolution
+global sw := 2560
+global sh := 1440
+
+global isAutoPotting := false
+
+;Array for storing pixel color for comparing
+global oldPoints := []
+
+;the color to be searched
+global itemColor := 0x00EA00
+
 /*
+	Readme
+
 	This script is designed around 2560 x 1440 resolution, it will not work on other resolution.
 	by changing certain item's text color with item filters, you can pickup item without clicking on them.
 	This script collect items from the cloest location first.
@@ -18,8 +32,9 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ;auto pickup item by searching a specific color on screen and automatically clicking it,
 ;mouse will return to the original posion after clicking.
 {
-	;the color to be searched
-	global itemColor := 0x00EA00
+	
+	
+	
 
 	;Look for a specific color on screen
 	search(ByRef x, ByRef y, xs, ys, xe, ye)
@@ -51,6 +66,8 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 		}
 		return false
 	}
+	
+	
 
 	;Auto pickup item
 	~^[::
@@ -59,9 +76,6 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 		cmx := 1280
 		cmy := 720
 		MouseGetPos, cmx, cmy
-
-		sw := 2560
-		sh := 1440
 		
 		;the total step needed to complete the search
 		step := 5
@@ -139,6 +153,8 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 		end_itemPickup:
 		return
 	}
+	
+	
 }
 
 ;Quick Inventory Management
@@ -193,4 +209,176 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 		Send {Shift up}
 		return
 	}
+}
+
+
+
+
+;Auto Potting
+{
+	
+	
+	;check all potting once
+	autoPotTick()
+	{
+		scourageArrowPathFinder()
+	}
+	
+	
+	
+	scourageArrowPathFinder()
+	{
+		;Life damaged
+		if(!checkColor(110, 1187, 0x562024))
+		{
+			;Kiara's
+			if(checkColor(438, 1400, 0x545152))
+				checkColorAndClick(416, 1433, 0xF9D799, "1")
+		}
+		
+		;very Low Life
+		if(!checkColor(134, 1323, 0x761219))
+		{
+			if(checkColor(500, 1404, 0x820603))
+				send 2
+		}
+		
+		if(isMoving())
+		{
+			if(checkColor(547, 1409, 0xE91A12))
+				checkColorAndClick(540, 1433, 0xF9D799, "3")
+				
+			if(checkColor(626, 1404, 0x0C3B14))
+				checkColorAndClick(600, 1433, 0xF9D799, "4")
+				
+			if(checkColor(684, 1403, 0x2EAE55))
+				checkColorAndClick(661, 1433, 0xF9D799, "5")
+		}
+		
+	}
+	
+	
+	;check if given pixel has the given color
+	checkColor(x, y, targetColor)
+	{
+		PixelGetColor, pixelColor, x, y , RGB
+		if(compareColor(pixelColor, targetColor))
+		{
+			return true
+		}
+		else
+		{
+			return false
+		}
+	}
+	
+	
+	
+	;check color and send key if color doesn't match
+	checkColorAndClick(x, y, targetColor, key)
+	{
+		if(!checkColor(x, y, targetColor))
+		{
+			Send % key
+		}
+	}
+	
+	;check if the character is moving
+	
+	toRGB(targetColor) 
+	{
+		return { "r": (targetColor >> 16) & 0xFF, "g": (targetColor >> 8) & 0xFF, "b": targetColor & 0xFF }
+	}
+	
+	;compare if both color is alike
+	compareColor(color1, color2, vary=5) 
+	{
+		c1 := toRGB(color1)
+		c2 := toRGB(color2)
+		rdiff := Abs( c1.r - c2.r )
+		gdiff := Abs( c1.g - c2.g )
+		bdiff := Abs( c1.b - c2.b )
+
+		return rdiff <= vary && gdiff <= vary && bdiff <= vary
+	}
+	
+	isMoving()
+	{
+		i := 1
+		score := 0
+		
+		Loop 20
+		{
+			;compare old point
+			oldPoint := oldPoints[i]
+			
+			
+			
+			if(oldPoint.x)
+			{
+				;ToolTip, % "oldPoint: " oldPoint "`noldPoint.oldColor: " oldPoint.oldColor
+				PixelGetColor, newColor, oldPoint.x, oldPoint.y
+				if(compareColor(newColor, oldPoint.oldColor))
+				{
+					score++
+				}
+			}
+			else
+			{
+				score++
+			}
+		
+			columnWidth := sw / 10
+			rowHeight := sh / 8
+			rx := (sw * 0.25) + (columnWidth * Mod(i , 5))
+			ry := (sh * 0.25) + (rowHeight * Mod(i , 4))
+			
+			PixelGetColor, pixelColor, rx, ry
+			;record a new point
+			point := {x: rx, y: ry, oldColor: pixelColor}
+	
+			oldPoints[i] := point
+			;ToolTip, % "point.x: " oldPoints[1] "`noldPoints[i].x: " oldPoints[i]
+			i++
+		}
+		
+		;ToolTip, score: %score%
+		
+		if(score <= 8)
+		{
+			return true
+		}
+		else
+		{
+			return false
+		}
+	}
+	
+	;check and apply pots once
+	~^,::
+	{
+		autoPotTick()
+		return
+	}
+	
+	;start or stop auto potting
+	#MaxThreadsPerHotkey 2
+	~^.::
+	{
+		isAutoPotting := !isAutoPotting
+		ToolTip, Auto Pot: %isAutoPotting%
+		SetTimer, RemoveToolTip, -3000
+		
+		;Main loop
+		while(isAutoPotting)
+		{
+			autoPotTick()
+			Sleep, 100
+		}
+		return
+	}
+	
+	RemoveToolTip:
+	ToolTip
+	return
 }
