@@ -15,6 +15,9 @@ global isAutoPotting := false
 ;Array for storing pixel color for comparing
 global oldPoints := []
 
+;For making potting when moving smoother
+global lastMovingTime := 0
+
 ;the color to be searched
 global itemColor := 0x00EA00
 
@@ -345,6 +348,11 @@ global itemColor := 0x00EA00
 		;ToolTip, score: %score%
 		
 		if(score <= 8)
+		{
+			lastMovingTime := A_TickCount
+		}
+		
+		if(lastMovingTime + 1000 >= A_TickCount)
 		{
 			return true
 		}
