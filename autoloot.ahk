@@ -239,8 +239,8 @@ global itemColor := 0x00EA00
 				checkColorAndClick(416, 1433, 0xF9D799, "1")
 		}
 		
-		;very Low Life
-		if(!checkColor(134, 1323, 0x761219))
+		;Low Life
+		if(!checkColor(352, 1431, 0x282727))
 		{
 			if(checkColor(500, 1404, 0x820603))
 				send 2
