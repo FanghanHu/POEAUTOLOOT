@@ -352,7 +352,7 @@ global itemColor := 0x00EA00
 			lastMovingTime := A_TickCount
 		}
 		
-		if(lastMovingTime + 1000 >= A_TickCount)
+		if(lastMovingTime + 500 >= A_TickCount)
 		{
 			return true
 		}
