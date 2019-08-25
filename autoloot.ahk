@@ -225,9 +225,29 @@ global itemColor := 0x00EA00
 	autoPotTick()
 	{
 		scourageArrowPathFinder()
+		;vaalArcJug()
 	}
 	
-	
+	vaalArcJug()
+	{
+		if(isMoving())
+		{
+			if(!checkColor(448, 1405, 0x1D1C1D))
+				checkColorAndClick(416, 1433, 0xF9D799, "1")
+				
+			if(!checkColor(498, 1415, 0x282928))
+				checkColorAndClick(477, 1433, 0xF9D799, "2")
+				
+			if(!checkColor(569, 1407, 0x2F2D31))
+				checkColorAndClick(540, 1433, 0xF9D799, "3")
+				
+			if(!checkColor(629, 1404, 0x151518))
+				checkColorAndClick(600, 1433, 0xF9D799, "4")
+				
+			if(!checkColor(682, 1405, 0x101213))
+				checkColorAndClick(661, 1433, 0xF9D799, "5")
+		}
+	}
 	
 	scourageArrowPathFinder()
 	{
