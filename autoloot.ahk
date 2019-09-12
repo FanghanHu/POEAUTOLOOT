@@ -251,33 +251,28 @@ global itemColor := 0x00EA00
 	
 	scourageArrowPathFinder()
 	{
-		;Life damaged
-		if(!checkColor(110, 1187, 0x562024))
-		{
-			;Kiara's
-			if(!checkColor(438, 1404, 0x111112))
-				checkColorAndClick(416, 1433, 0xF9D799, "1")
-		}
 		
 		;Low Life
 		if(!checkColor(142, 1220, 0x9D1824))
 		{
-			if(!checkColor(498, 1407, 0x1D1C1C))
-				send 2
+			if(!checkColor(425, 1408, 0x2D1C11))
+				send 1
 		}
 		
 		if(isMoving())
 		{
-			if(!checkColor(569, 1402, 0x0F0E11))
+			if(!checkColor(496, 1409, 0x0C0E0D))
+				checkColorAndClick(480, 1433, 0xF9D799, "2")
+				
+			if(!checkColor(563, 1405, 0x131412))
 				checkColorAndClick(540, 1433, 0xF9D799, "3")
 				
-			if(!checkColor(623, 1403, 0x0C110E))
+			if(!checkColor(631, 1399, 0x0A0F0F))
 				checkColorAndClick(600, 1433, 0xF9D799, "4")
 				
-			if(!checkColor(685, 1402, 0x121413))
+			if(!checkColor(684, 1403, 0x111312))
 				checkColorAndClick(661, 1433, 0xF9D799, "5")
 		}
-		
 	}
 	
 	
